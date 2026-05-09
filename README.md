@@ -41,6 +41,7 @@ Karena ekstensi ini tidak (atau belum) diunggah ke Chrome Web Store, Anda perlu 
 
 ## Troubleshooting
 - Jika ekstensi tidak bisa menghapus maka anda perlu monitoring beberapa penghapusan di tab background. Tidak perlu klik apapun ketika tombol background berjalan. 
+- Jika kode stuck di "Finished: No more reposts found", anda perlu hapus riwayat tiktok di browser.
 
 ## 🛠️ Struktur Direktori
 
@@ -58,6 +59,7 @@ remove-repost-extension/
 │   ├── automation.js      # Logika utama (Loop otomasi, Shield, dan Navigasi DOM)
 │   ├── content.js         # Entry point & Injeksi script Anti-Throttling ke halaman web
 │   ├── selectors.js       # Kumpulan selektor DOM (data-e2e) untuk TikTok
+│   ├── bypass.js          # bypass anti tiktok detection
 │   └── utils.js           # Fungsi pembantu (delay acak, logger, dll)
 │
 └── popup/
@@ -72,3 +74,4 @@ remove-repost-extension/
 
 - **Pembaruan Antarmuka TikTok**: TikTok sering kali mengubah struktur kode HTML/CSS mereka (A/B Testing). Jika ekstensi tiba-tiba tidak berfungsi, kemungkinan besar atribut \`data-e2e\` atau selektor tombol telah berubah. Selektor tersebut dapat diperbarui secara terpusat di file \`content/selectors.js\`.
 - Gunakan alat otomasi ini secara wajar. Kami tidak bertanggung jawab atas tindakan pembatasan akun yang mungkin dilakukan oleh pihak TikTok akibat aktivitas bot yang berlebihan.
+- Program tidak berjalan instan perlu 2-3 detik untuk menghapus satu repost.

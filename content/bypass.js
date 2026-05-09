@@ -1,4 +1,17 @@
 (() => {
+    // ONLY run if this is our automated bot tab!
+    // TikTok servers return 404 if we use query parameters on /profile, so we use a hash fragment instead.
+    if (window.location.hash === '#ttbot') {
+        try { sessionStorage.setItem('ttbot_active', 'true'); } catch (e) {}
+    }
+    
+    let isBot = false;
+    try { isBot = sessionStorage.getItem('ttbot_active') === 'true'; } catch (e) {}
+    
+    if (!isBot && window.location.hash !== '#ttbot') {
+        return; // Exit immediately, do not interfere with normal TikTok usage
+    }
+
     // 1. Force document to always appear visible and focused to React/SPA
     Object.defineProperty(document, 'visibilityState', { get: () => 'visible' });
     Object.defineProperty(document, 'hidden', { get: () => false });
@@ -15,23 +28,39 @@
         return window.setTimeout(() => callback(performance.now()), 16);
     };
 
-    // 3. Force IntersectionObserver to trigger (TikTok relies on this for lazy loading posts)
+    // 3. Force IntersectionObserver to trigger WITHOUT spamming (which causes TikTok to terminate session)
     const OriginalObserver = window.IntersectionObserver;
     window.IntersectionObserver = class extends OriginalObserver {
        constructor(callback, options) {
           super(callback, options);
           this._cb = callback;
+          this._observed = new Set();
+          
+          window.addEventListener('ForceTTIntersect', () => {
+             if (this._observed.size === 0) return;
+             const entries = Array.from(this._observed).map(el => ({
+                 isIntersecting: true,
+                 intersectionRatio: 1,
+                 target: el
+             }));
+             this._cb(entries, this);
+          });
        }
        observe(element) {
           super.observe(element);
-          // Force trigger immediately and periodically so lazy-loaded elements always load
-          const trigger = () => {
-             if (document.hidden !== undefined) {
-               this._cb([{ isIntersecting: true, intersectionRatio: 1, target: element }], this);
-             }
-          };
-          trigger();
-          setInterval(trigger, 3000);
+          this._observed.add(element);
+          // Only trigger once upon observation to load initial items
+          setTimeout(() => {
+             this._cb([{ isIntersecting: true, intersectionRatio: 1, target: element }], this);
+          }, 500);
+       }
+       unobserve(element) {
+          super.unobserve(element);
+          this._observed.delete(element);
+       }
+       disconnect() {
+          super.disconnect();
+          this._observed.clear();
        }
     };
 

@@ -6,10 +6,12 @@ window.TTRemoverAutomation = {
   isRunning: false,
   removedCount: 0,
   failedCount: 0,
+  processedUrls: new Set(),
 
   start: async function() {
     if (this.isRunning) return;
     this.isRunning = true;
+    this.processedUrls.clear(); // Reset on start
     log("Automation started.");
     updateBackgroundState({ statusMessage: 'Starting automation...', isRunning: true });
     
@@ -104,9 +106,28 @@ window.TTRemoverAutomation = {
         retries--;
       }
 
-      const selector = Selectors.repostItem + ':not([data-repost-processed="true"])';
-      const reposts = document.querySelectorAll(selector);
-      if (reposts.length === 0) {
+      const reposts = document.querySelectorAll(Selectors.repostItem);
+      
+      let targetItem = null;
+      let targetUrl = null;
+      
+      for (const item of reposts) {
+         const link = item.querySelector('a');
+         const url = link && link.href ? link.href.split('?')[0] : null; 
+         
+         if (url && !this.processedUrls.has(url)) {
+            targetItem = item;
+            targetUrl = url;
+            this.processedUrls.add(url);
+            break;
+         } else if (!url && !item.hasAttribute('data-fallback-processed')) {
+            targetItem = item;
+            item.setAttribute('data-fallback-processed', 'true');
+            break;
+         }
+      }
+
+      if (!targetItem) {
         // Attempt to find and click the "Reposts" tab if we're on the profile but the tab isn't active
         let clickedTab = false;
         
@@ -143,6 +164,7 @@ window.TTRemoverAutomation = {
         // Force layout/IntersectionObserver updates in background tabs
         window.dispatchEvent(new Event('resize'));
         window.dispatchEvent(new Event('scroll'));
+        window.dispatchEvent(new CustomEvent('ForceTTIntersect')); // Safely trigger our modified observer
         
         // Wait and check multiple times (up to 10 seconds) for network requests to finish
         let found = false;
@@ -150,10 +172,20 @@ window.TTRemoverAutomation = {
            await randomDelay(1500, 2000);
            if (!this.isRunning) break;
            
-           if (document.querySelectorAll(selector).length > 0) {
-              found = true;
-              break;
+           // Check if there are any NEW unprocessed items
+           const currentReposts = document.querySelectorAll(Selectors.repostItem);
+           for (const item of currentReposts) {
+               const link = item.querySelector('a');
+               const url = link && link.href ? link.href.split('?')[0] : null;
+               if (url && !this.processedUrls.has(url)) {
+                   found = true;
+                   break;
+               } else if (!url && !item.hasAttribute('data-fallback-processed')) {
+                   found = true;
+                   break;
+               }
            }
+           if (found) break;
         }
         
         if (!found && this.isRunning) {
@@ -164,20 +196,15 @@ window.TTRemoverAutomation = {
         continue;
       }
 
-      // Process the first visible repost item
-      const item = reposts[0];
-      // Mark it immediately so we never re-process the exact same DOM node
-      item.setAttribute('data-repost-processed', 'true');
-
       try {
         updateBackgroundState({ statusMessage: 'Processing item...' });
         
         // 1. Click the item to open it (find the <a> tag inside)
-        const videoLink = item.querySelector('a');
+        const videoLink = targetItem.querySelector('a');
         if (videoLink) {
           videoLink.click();
         } else {
-          item.click();
+          targetItem.click();
         }
         
         // Wait for the video page/modal to load

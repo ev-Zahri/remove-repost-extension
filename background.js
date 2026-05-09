@@ -69,7 +69,7 @@ async function startInBackgroundTab() {
   try {
     // Create a new minimized window. This bypasses Chrome's strict background tab limitations.
     chrome.windows.create({
-      url: 'https://www.tiktok.com/profile',
+      url: 'https://www.tiktok.com/profile#ttbot',
       state: 'minimized',
       type: 'normal'
     }, (win) => {
