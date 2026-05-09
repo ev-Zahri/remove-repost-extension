@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TikTok Repost Remover</title>
+  <link rel="stylesheet" href="popup.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <img src="../assets/color-icon.png" alt="TikTok Logo" width="50" height="50">
+        <div>
+          <h1 style="font-size: 16px; margin: 0;">Remove Repost</h1>
+          <p style="font-size: 12px; margin: 0; color: #64748b;">Bulk remove TikTok reposts automatically</p>
+        </div>
+      </div>
+    </header>
+
+    <div class="stats-card">
+      <div class="stat-row">
+        <span class="stat-label">Status</span>
+        <span class="stat-value status-badge" id="status-badge">Idle</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Removed</span>
+        <span class="stat-value text-success" id="removed-count">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Failed</span>
+        <span class="stat-value text-danger" id="failed-count">0</span>
+      </div>
+      <div class="stat-row">
+        <span class="stat-label">Info</span>
+        <span class="stat-value text-muted" id="status-msg">-</span>
+      </div>
+    </div>
+
+    <div class="actions" style="margin-top: 10px;">
+      <button id="btn-start" class="btn btn-primary">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+        Start
+      </button>
+      <button id="btn-stop" class="btn btn-danger" disabled>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect></svg>
+        Stop
+      </button>
+    </div>
+    
+    <div class="warning-box" id="warning-msg" style="display: none;">
+      Please navigate to your TikTok Repost tab first.
+    </div>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

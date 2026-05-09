@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "TikTok Repost Remover",
+  "version": "1.0.0",
+  "description": "Remove your TikTok reposts automatically with human-like delays.",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://www.tiktok.com/*"
+  ],
+  "icons": {
+    "16": "assets/color-icon.png",
+    "48": "assets/color-icon.png",
+    "128": "assets/color-icon.png"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "Remove Reposts",
+    "default_icon": {
+      "16": "assets/color-icon.png",
+      "48": "assets/color-icon.png",
+      "128": "assets/color-icon.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.tiktok.com/*"],
+      "js": [
+        "content/utils.js",
+        "content/selectors.js",
+        "content/automation.js",
+        "content/content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ]
+}
