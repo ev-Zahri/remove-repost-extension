@@ -39,6 +39,9 @@ Karena ekstensi ini tidak (atau belum) diunggah ke Chrome Web Store, Anda perlu 
 
 ---
 
+## Troubleshooting
+- Jika ekstensi tidak bisa menghapus maka anda perlu monitoring beberapa penghapusan di tab background. Tidak perlu klik apapun ketika tombol background berjalan. 
+
 ## 🛠️ Struktur Direktori
 
 ```

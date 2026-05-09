@@ -38,6 +38,12 @@
         "content/content.js"
       ],
       "run_at": "document_start"
+    },
+    {
+      "matches": ["https://www.tiktok.com/*"],
+      "js": ["content/bypass.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
     }
   ]
 }

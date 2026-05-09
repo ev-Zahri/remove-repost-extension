@@ -212,14 +212,24 @@ window.TTRemoverAutomation = {
 
         // 3. Click "Remove repost" button
         if (removeBtn) {
-          removeBtn.click();
-          this.removedCount++;
-          updateBackgroundState({ 
-            removedCount: this.removedCount,
-            statusMessage: 'Repost removed.'
-          });
-          log(`Removed repost #${this.removedCount}`);
-          await randomDelay(2000, 3500);
+          const btnText = removeBtn.innerText ? removeBtn.innerText.toLowerCase() : '';
+          const isSafeToClick = !btnText || btnText.includes('remove') || btnText.includes('hapus') || btnText.includes('undo') || btnText.includes('batal');
+          
+          if (isSafeToClick) {
+            removeBtn.click();
+            this.removedCount++;
+            updateBackgroundState({ 
+              removedCount: this.removedCount,
+              statusMessage: 'Repost removed.'
+            });
+            log(`Removed repost #${this.removedCount}`);
+            await randomDelay(3000, 4500); // Slightly longer delay to respect TikTok's rate limits
+          } else {
+            log(`Button says "${btnText}", skipping to prevent accidental repost.`);
+            this.failedCount++;
+            updateBackgroundState({ failedCount: this.failedCount, statusMessage: 'Skipped: Already removed' });
+            await randomDelay(1000, 1500);
+          }
         } else {
           log("Remove button not found for this item. Skipping.");
           this.failedCount++;
